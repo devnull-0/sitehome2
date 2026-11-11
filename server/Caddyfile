@@ -1,0 +1,55 @@
+# Caddy 2 configuration for pwistudio.com (static site, no scripts).
+# Caddy obtains and renews HTTPS certificates automatically.
+#   caddy run --config server/Caddyfile
+# Keep the header values identical to public/_headers.
+
+(security_headers) {
+	header {
+		Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), sync-xhr=(), usb=(), xr-spatial-tracking=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Embedder-Policy "require-corp"
+		Cross-Origin-Resource-Policy "same-origin"
+		Origin-Agent-Cluster "?1"
+		X-Permitted-Cross-Domain-Policies "none"
+		X-DNS-Prefetch-Control "off"
+		-Server
+	}
+}
+
+www.pwistudio.com {
+	import security_headers
+	redir https://pwistudio.com{uri} permanent
+}
+
+pwistudio.com {
+	root * /var/www/pwistudio.com/public
+	encode zstd gzip
+	import security_headers
+
+	# Only GET and HEAD
+	@notget not method GET HEAD
+	respond @notget 405
+
+	# Hidden files (except /.well-known/), config files, scripts, backups
+	@private {
+		path_regexp private (?i)(/\.|^/_headers$|\.(php\d?|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp|bak|old|orig|swp|log|ini|conf|env|md|yml|yaml|sql|zip|tar|gz)$)
+		not path /.well-known/*
+	}
+	respond @private 404
+
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=604800"
+
+	handle_errors {
+		import security_headers
+		rewrite * /404.html
+		file_server
+	}
+
+	file_server
+}
