@@ -6,22 +6,31 @@ does not use webfonts.
 It is the home page for **PW&i Studio + Hoffman Images**: graphic design and
 printing (PW&i Studio) and studio photography (Hoffman Images).
 
-- **Layout:** bold, photo-led and mostly dark: a near-black hero with
-  oversized condensed headlines, a split panel (color block with an inset photo
-  beside a full-height portrait), a "Recent work" photo collage, then
-  Design + Print, the "Shoot it. Design it. Print it." process, and contact.
+- **Look:** light and airy, modeled on the "Magnium" reference: white and
+  aluminium-gray backgrounds, a hero with two portraits and translucent
+  cerulean, tangerine and yellow shapes, thin large headings and blue buttons.
+  Black is used only for text (as a soft charcoal).
 - **Palette:** Cerulean `#4484CE`, Aluminium `#D9D9D9`, Light `#F9CF00`
-  (yellow) and Tangerine `#F19F4D`, on near-black `#0D0D0D`. A deeper
-  cerulean `#2F6DB5` is used where blue sits on a light background, for
-  contrast. Every text/background pair meets WCAG AA.
-- **Logos as the page title:** the PW&i Design + Print and Hoffman Images logos
-  (`public/assets/logo/`) form the main heading, header and footer. On dark
-  backgrounds the Hoffman Images wordmark is shown in white.
+  (yellow) and Tangerine `#F19F4D`. A deeper cerulean `#2F6DB5` carries white
+  text (buttons, the hero panel, the contact card) so it stays readable. The
+  favicon sits on cream `#EDE8D0`. Every text/background pair meets WCAG AA,
+  including text over photos.
+- **Logos:** the PW&i Design + Print and Hoffman Images logos
+  (`public/assets/logo/`) appear in the header (compact marks) and footer.
 - **Text: a Roboto-style sans-serif, with no webfonts.** The page uses the
   sans-serif already on each device: Roboto on Android and Chromebooks, Segoe
   UI on Windows, San Francisco on iPhone, iPad and Mac. Nothing is downloaded.
-- **Large lettering as images:** the big headlines are SVG vector outlines of
-  Roboto Condensed (`public/assets/type/`), so they look the same everywhere.
+  Headings are real text so search engines can read them; the large
+  decorative numbers (01/02/03, 404) are SVG drawings of Roboto Light.
+- **SEO sections:** high school senior photos and holiday photos (U.S. and
+  international holidays) for families across Washington State, with FAQs.
+  The page title, description, headings, image file names and alt text are
+  written for those searches, and schema.org business details (service area:
+  Washington) are included as plain HTML attributes, without any script.
+- **Responsive (RWD):** mobile-first CSS, tested from 320 px phones to 2560 px
+  monitors with no sideways scrolling. Phones and tablets get a Menu button
+  that works without JavaScript; the full navigation appears from 1152 px.
+  Photos are served at the right size for each screen.
 - **Photos:** six Hoffman Images photos (`public/assets/photos/`), used with
   the subjects' photography releases, served as WebP with JPEG fallbacks and
   stripped of all metadata.
@@ -49,10 +58,9 @@ SVGs are generated, not hand-edited, and contain only plain shapes: no
 public/                 <- the web root: upload only this folder
   index.html, 404.html
   assets/css/site.css   the only stylesheet
-  assets/logo/*.svg     the two logos (full versions, compact header marks,
-                        white-wordmark Hoffman Images for dark backgrounds)
+  assets/logo/*.svg     the two logos (full versions + compact header marks)
   assets/photos/*       photos: WebP at 480/960/1440 px + one JPEG fallback
-  assets/type/*.svg     large lettering (generated)
+  assets/type/*.svg     large decorative numbers (generated)
   assets/img/*          swatch-fan illustration (generated) + social preview image
   favicon.svg/.ico, apple-touch-icon.png, robots.txt, sitemap.xml
   .well-known/security.txt
@@ -63,10 +71,10 @@ server/
   Caddyfile             Caddy config
 tools/
   prepare_photos.py     strips metadata and makes web sizes of new photos
-  build_graphics.py     regenerates the lettering and illustration
+  build_graphics.py     regenerates the numbers and the swatch-fan illustration
   render_png.mjs        regenerates favicon.ico, touch icon, social image (needs Playwright)
   audit_site.py         security audit, standard library only
-  fonts/                Roboto Condensed (SIL OFL), used at build time only
+  fonts/                Roboto Light (SIL OFL), used at build time only
 ```
 
 ## Deploying
@@ -91,17 +99,24 @@ run.
 
 ### Before going live
 
-1. Replace `hello@pwistudio.com` (in `index.html` and
+1. Read the senior and holiday sections and their FAQs and adjust anything
+   that doesn't match how you work (locations, timing advice, services).
+2. Replace `hello@pwistudio.com` (in `index.html` and
    `.well-known/security.txt`) if your address is different. Add a phone
    number or street address to the contact card if you want them shown.
-2. Pick `pwistudio.com` or `www.pwistudio.com` as the main address. The
+3. Pick `pwistudio.com` or `www.pwistudio.com` as the main address. The
    configs redirect `www` to the bare domain and the canonical/OG tags use
    the bare domain.
-3. HSTS uses `includeSubDomains`: make sure every subdomain (mail, shop...)
+4. HSTS uses `includeSubDomains`: make sure every subdomain (mail, shop...)
    works over HTTPS, or remove `includeSubDomains` from the four header
    configs.
-4. Renew the `Expires` date in `security.txt` before **2027-11-11**.
-5. Check the live site with [Mozilla Observatory](https://developer.mozilla.org/en-US/observatory),
+5. Renew the `Expires` date in `security.txt` before **2027-11-11**.
+6. For local search, create or update your free **Google Business Profile**
+   and, if you have a studio address and phone number, add them to the page
+   footer and to the business details in `index.html` (search engines show
+   richer local results when they have an address). Use the same name,
+   address and phone everywhere.
+7. Check the live site with [Mozilla Observatory](https://developer.mozilla.org/en-US/observatory),
    [securityheaders.com](https://securityheaders.com) and
    [SSL Labs](https://www.ssllabs.com/ssltest/).
 
@@ -125,10 +140,11 @@ python3 -m venv .venv
   camera details), saves web sizes in `public/assets/photos/` and prints the
   `<picture>` markup to paste into the page. Write a plain description of
   the photo in its `alt` text (don't name the people in it).
-- **Large lettering:** edit the `IMAGES` list in `tools/build_graphics.py`, run
-  `.venv/bin/python tools/build_graphics.py`, then copy the printed
-  `width`/`height` into the matching `<img>` tag. Keep the `alt` text identical
-  to the lettering.
+- **Headings and copy:** edit `public/index.html`. Each school year, update
+  "Class of 2027" in the hero tiles and senior section.
+- **Decorative numbers:** edit the `IMAGES` list in `tools/build_graphics.py`,
+  run `.venv/bin/python tools/build_graphics.py`, then copy the printed
+  `width`/`height` into the matching `<img>` tag.
 - **Favicon / social image:** `node tools/render_png.mjs` (instructions in the file).
 - **Logos:** the files in `public/assets/logo/` were traced into vector shapes
   from screenshots of the Canva designs. For exact originals, export each logo

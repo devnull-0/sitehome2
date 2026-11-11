@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Build the site's large lettering and illustrations as plain SVG.
+"""Build the site's large decorative lettering and illustration as plain SVG.
 
-The website loads no webfonts. Every large headline is drawn ahead of time:
-this script shapes the text with HarfBuzz (so kerning is right), converts
-each glyph into vector paths and writes a small, self-contained SVG to
-public/assets/type/. It also draws the swatch-fan illustration.
+The website loads no webfonts. Headings are real text in each device's own
+sans-serif (so search engines and screen readers read them directly); the
+large decorative characters (the 01/02/03 step numbers and the 404) are
+drawn ahead of time by this script: it shapes the text with HarfBuzz,
+converts each glyph into vector paths and writes a small, self-contained SVG
+to public/assets/type/. It also draws the swatch-fan illustration.
 
-Typeface: Roboto Condensed (tools/fonts/, SIL Open Font License), used here
-at build time only and never published. Body text on the site uses each
-device's own sans-serif (Roboto on Android, Segoe UI on Windows, San
-Francisco on Apple devices).
+Typeface: Roboto Light (tools/fonts/, SIL Open Font License), used here at
+build time only and never published.
 
 The SVGs contain only plain shapes with presentation attributes: no
 <style>, no <script>, no links, no fonts. (The logos in public/assets/logo/
@@ -22,7 +22,7 @@ Usage (from the repository root):
     .venv/bin/python tools/build_graphics.py            # rebuild every image
     .venv/bin/python tools/build_graphics.py --list     # print sizes for <img> tags
 
-To change a headline, edit IMAGES below, re-run the script and update the
+To change one, edit IMAGES below, re-run the script and update the
 width/height attributes of the matching <img> in public/*.html with the
 numbers printed by --list.
 """
@@ -53,7 +53,7 @@ CERULEAN_DEEP = "#2F6DB5"  # cerulean for lettering on light backgrounds (contra
 ALUMINIUM = "#D9D9D9"
 LIGHT = "#F9CF00"      # yellow
 TANGERINE = "#F19F4D"
-INK = "#0D0D0D"        # near-black page background
+INK = "#1F1F1F"        # charcoal text
 WHITE = "#FFFFFF"
 
 STAR = "✦"        # four-pointed sparkle, drawn by hand (not in the font)
@@ -66,8 +66,7 @@ class Style:
     file: str
 
 
-BOLD = Style("RobotoCondensed-Bold.latin.woff2")
-HEAVY = Style("RobotoCondensed-ExtraBold.latin.woff2")
+LIGHT_WEIGHT = Style("Roboto-Light.latin.woff2")
 
 
 # Image description ----------------------------------------------------------
@@ -103,58 +102,17 @@ def L(*runs: Run, size: float, indent: float = 0.0, tracking: float = 0.0) -> Li
     return Line(list(runs), size, indent, tracking)
 
 
-def Y(text: str, size: float = 96) -> Line:
-    """One line of the hero statement, in yellow."""
-    return L(Run(text, HEAVY, LIGHT), size=size)
-
-
-HERO_ALT = "Portraits. Families. Graduates. Design and print. Made to be seen."
-
 IMAGES: list[Image] = [
-    # Hero statement: wide screens (three lines) and phones (six lines)
-    Image("hero-statement-wide", HERO_ALT, [
-        Y("PORTRAITS. FAMILIES."), Y("GRADUATES. DESIGN AND"), Y("PRINT. MADE TO BE SEEN."),
-    ], leading=0.98),
-    Image("hero-statement-narrow", HERO_ALT, [
-        Y("PORTRAITS."), Y("FAMILIES."), Y("GRADUATES."),
-        Y("DESIGN AND"), Y("PRINT. MADE"), Y("TO BE SEEN."),
-    ], leading=0.98),
-
-    # Ribbon of large words (decorative)
-    Image("band", "Design, Print, Photograph", [
-        L(Run("DESIGN", HEAVY, WHITE), Run(f" {STAR} ", HEAVY, LIGHT),
-          Run("PRINT", HEAVY, WHITE), Run(f" {STAR} ", HEAVY, LIGHT),
-          Run("PHOTOGRAPH", HEAVY, WHITE), Run(f" {STAR} ", HEAVY, LIGHT),
-          size=80),
-    ], pad=0, hbox="advance"),
-
-    # Section headings
-    Image("h-photography", "Photography", [
-        L(Run("PHOTOGRAPHY", HEAVY, TANGERINE), size=120),
-    ]),
-    Image("h-recent-work", "Recent work", [
-        L(Run("RECENT", HEAVY, LIGHT), size=120),
-        L(Run("WORK", HEAVY, LIGHT), size=120),
-    ], leading=0.92),
-    Image("h-design-print", "Design + Print", [
-        L(Run("DESIGN ", HEAVY, INK), Run("+", HEAVY, CERULEAN_DEEP), Run(" PRINT", HEAVY, INK), size=112),
-    ]),
-    Image("h-one-studio", "Shoot it. Design it. Print it.", [
-        L(Run("SHOOT IT. ", HEAVY, INK), Run("DESIGN IT.", HEAVY, WHITE), size=100),
-        L(Run("PRINT IT.", HEAVY, INK), size=100),
-    ], leading=0.95),
-    Image("h-contact", "Let’s make something.", [
-        L(Run("LET’S MAKE", HEAVY, INK), size=120),
-        L(Run("SOMETHING.", HEAVY, INK), size=120),
-    ], leading=0.92),
-
     # Large step numerals (decorative; the steps are a numbered list)
-    Image("n-01", "01", [L(Run("01", HEAVY, WHITE), size=120)], pad=2),
-    Image("n-02", "02", [L(Run("02", HEAVY, WHITE), size=120)], pad=2),
-    Image("n-03", "03", [L(Run("03", HEAVY, WHITE), size=120)], pad=2),
+    Image("n-01", "01", [L(Run("01", LIGHT_WEIGHT, CERULEAN_DEEP), size=120)], pad=2),
+    Image("n-02", "02", [L(Run("02", LIGHT_WEIGHT, CERULEAN_DEEP), size=120)], pad=2),
+    Image("n-03", "03", [L(Run("03", LIGHT_WEIGHT, CERULEAN_DEEP), size=120)], pad=2),
 
     # 404 page
-    Image("t-404", "404", [L(Run("404", HEAVY, LIGHT), size=220)]),
+    Image("t-404", "404", [
+        L(Run("4", LIGHT_WEIGHT, CERULEAN_DEEP), Run("0", LIGHT_WEIGHT, TANGERINE),
+          Run("4", LIGHT_WEIGHT, CERULEAN_DEEP), size=220),
+    ]),
 ]
 
 
@@ -310,17 +268,17 @@ def render(img: Image) -> tuple[str, float, float]:
 def swatch_fan() -> str:
     """A printer's color-swatch fan in the site colors. Decorative."""
     chips = []
-    for angle, color in ((-33, INK), (-11, CERULEAN), (11, LIGHT), (33, TANGERINE)):
+    for angle, color in ((-33, CERULEAN_DEEP), (-11, CERULEAN), (11, LIGHT), (33, TANGERINE)):
         chips.append(
             f'<g transform="translate(210 334) rotate({angle})">'
             f'<rect x="-46" y="-270" width="92" height="290" rx="6" fill="{WHITE}" '
-            f'stroke="{INK}" stroke-opacity=".18" stroke-width="1.5"/>'
+            f'stroke="{INK}" stroke-opacity=".14" stroke-width="1.5"/>'
             f'<path fill="{color}" d="M-46 -264a6 6 0 0 1 6-6h80a6 6 0 0 1 6 6v164h-92z"/>'
             f'<rect x="-34" y="-86" width="52" height="7" rx="1" fill="{INK}" fill-opacity=".6"/>'
             f'<rect x="-34" y="-72" width="34" height="6" rx="1" fill="{INK}" fill-opacity=".3"/>'
             '</g>')
-    rivet = (f'<circle cx="210" cy="334" r="10" fill="{INK}"/>'
-             f'<circle cx="210" cy="334" r="3.5" fill="{ALUMINIUM}"/>')
+    rivet = (f'<circle cx="210" cy="334" r="10" fill="{CERULEAN_DEEP}"/>'
+             f'<circle cx="210" cy="334" r="3.5" fill="{WHITE}"/>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 420 340" '
             f'width="420" height="340" aria-hidden="true">' + "".join(chips) + rivet + "</svg>\n")
 
