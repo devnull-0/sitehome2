@@ -10,6 +10,7 @@ ErrorDocument 403 /404.html
 ErrorDocument 404 /404.html
 
 AddType image/svg+xml .svg
+AddType image/webp .webp
 AddType image/x-icon .ico
 AddType application/xml .xml
 AddCharset utf-8 .html .css .txt .xml .svg
@@ -59,7 +60,7 @@ RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
   Header always unset X-Powered-By
   Header unset X-Powered-By
 
-  <FilesMatch "\.(css|svg|png|ico)$">
+  <FilesMatch "\.(css|svg|png|ico|jpe?g|webp)$">
     Header set Cache-Control "public, max-age=604800"
   </FilesMatch>
   <FilesMatch "\.html$">

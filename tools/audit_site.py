@@ -101,6 +101,13 @@ class PageAudit(HTMLParser):
             elif low.startswith("https:"):
                 if not (tag == "link" and name == "href" and ALLOWED_ABSOLUTE.match(url)):
                     fail(self.path, f"{name}={url!r} loads from another site")
+            elif url:
+                # a file on this site: make sure it exists (catches typos and stale names)
+                local = url.split("#")[0].split("?")[0]
+                if local and local != "/":
+                    target = (PUBLIC / local.lstrip("/")) if local.startswith("/") else (self.path.parent / local)
+                    if not target.resolve().is_file():
+                        fail(self.path, f"{name}={url!r} points to a file that does not exist")
 
 
 def audit_html(path: Path) -> None:
@@ -154,6 +161,52 @@ def audit_css(path: Path) -> None:
         fail(path, "legacy script-in-CSS construct found")
 
 
+def image_metadata(path: Path) -> list[str]:
+    """Names of metadata blocks found in a JPEG, PNG or WebP file."""
+    data = path.read_bytes()
+    found = []
+    if data[:2] == b"\xff\xd8":  # JPEG: walk the segments before the image data
+        i = 2
+        while i + 4 <= len(data) and data[i] == 0xFF:
+            marker = data[i + 1]
+            if marker == 0xDA:  # start of scan: metadata comes before this
+                break
+            length = int.from_bytes(data[i + 2:i + 4], "big")
+            seg = data[i + 4:i + 2 + length]
+            if marker == 0xE1 and seg.startswith(b"Exif\x00"):
+                found.append("EXIF")
+            elif marker == 0xE1 and b"ns.adobe.com/xap" in seg[:64]:
+                found.append("XMP")
+            elif marker == 0xFE:
+                found.append("comment")
+            elif 0xE3 <= marker <= 0xEF and marker != 0xEE:  # APP2 (ICC color) and APP14 are fine
+                found.append(f"APP{marker - 0xE0}")
+            i += 2 + length
+    elif data[:8] == b"\x89PNG\r\n\x1a\n":
+        i = 8
+        while i + 8 <= len(data):
+            length = int.from_bytes(data[i:i + 4], "big")
+            kind = data[i + 4:i + 8]
+            if kind in (b"eXIf", b"tEXt", b"iTXt", b"zTXt"):
+                found.append(kind.decode())
+            i += 12 + length
+    elif data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        i = 12
+        while i + 8 <= len(data):
+            kind = data[i:i + 4]
+            size = int.from_bytes(data[i + 4:i + 8], "little")
+            if kind in (b"EXIF", b"XMP "):
+                found.append(kind.decode().strip())
+            i += 8 + size + (size & 1)
+    return found
+
+
+def audit_image(path: Path) -> None:
+    meta = image_metadata(path)
+    if meta:
+        fail(path, f"contains metadata ({', '.join(sorted(set(meta)))}): run tools/prepare_photos.py on it")
+
+
 def audit_headers() -> None:
     for f in HEADER_FILES:
         if not f.exists():
@@ -199,6 +252,8 @@ def main() -> int:
             audit_svg(path)
         elif ext == ".css":
             audit_css(path)
+        elif ext in (".jpg", ".jpeg", ".png", ".webp"):
+            audit_image(path)
     audit_headers()
     audit_security_txt()
 
@@ -207,7 +262,8 @@ def main() -> int:
         for p in problems:
             print("  -", p)
         return 1
-    print("Site audit passed: no scripts, no third-party requests, no webfonts, headers consistent.")
+    print("Site audit passed: no scripts, no third-party requests, no webfonts, no photo metadata, "
+          "no broken links, headers consistent.")
     return 0
 
 

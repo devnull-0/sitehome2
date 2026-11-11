@@ -1,23 +1,19 @@
 #!/usr/bin/env python3
 """Build the site's large lettering and illustrations as plain SVG.
 
-The website loads no webfonts. Every large heading is drawn ahead of time:
-this script shapes the text with HarfBuzz (so kerning and ligatures are
-right), converts each glyph into vector paths and writes a small,
-self-contained SVG to public/assets/type/. It also draws the illustrations
-in public/assets/img/ and the favicon.
+The website loads no webfonts. Every large headline is drawn ahead of time:
+this script shapes the text with HarfBuzz (so kerning is right), converts
+each glyph into vector paths and writes a small, self-contained SVG to
+public/assets/type/. It also draws the swatch-fan illustration.
 
-Typeface: Georgia, to match the body text. Georgia is a Microsoft font that
-cannot be redistributed, so it is not in this repository. If it is installed
-on the computer running this script (it is on every Mac and Windows PC) it is
-used automatically. Otherwise the script falls back to Gelasio
-(tools/fonts/, SIL Open Font License), a free typeface designed as a
-metric-compatible alternative to Georgia. Force one with --font.
+Typeface: Roboto Condensed (tools/fonts/, SIL Open Font License), used here
+at build time only and never published. Body text on the site uses each
+device's own sans-serif (Roboto on Android, Segoe UI on Windows, San
+Francisco on Apple devices).
 
 The SVGs contain only plain shapes with presentation attributes: no
-<style>, no <script>, no links, no fonts. Font files are used here at build
-time only and are never published. (The logos in public/assets/logo/ are
-not generated here.)
+<style>, no <script>, no links, no fonts. (The logos in public/assets/logo/
+and the photos in public/assets/photos/ are not generated here.)
 
 Usage (from the repository root):
 
@@ -26,7 +22,7 @@ Usage (from the repository root):
     .venv/bin/python tools/build_graphics.py            # rebuild every image
     .venv/bin/python tools/build_graphics.py --list     # print sizes for <img> tags
 
-To change a heading, edit IMAGES below, re-run the script and update the
+To change a headline, edit IMAGES below, re-run the script and update the
 width/height attributes of the matching <img> in public/*.html with the
 numbers printed by --list.
 """
@@ -35,7 +31,6 @@ from __future__ import annotations
 
 import argparse
 import io
-import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -52,73 +47,27 @@ ROOT = Path(__file__).resolve().parent.parent
 FONT_DIR = ROOT / "tools" / "fonts"
 OUT_DIR = ROOT / "public" / "assets" / "type"
 
-# Warm-neutral palette (same values as public/assets/css/site.css) ----------
-LINEN = "#F3EDE3"     # page background
-IVORY = "#FBF8F2"     # cards, text on dark sections
-SAND = "#E6DCCC"      # alternate light background
-OAT = "#CDBDA6"       # borders, decoration
-TAUPE = "#9C8775"     # decoration
-CAMEL = "#A8835F"     # warm accent (decoration and large lettering only)
-MOCHA = "#6E5646"     # buttons, links, dark section
-ESPRESSO = "#3A2E26"  # text, darkest section
-SHADOW = "#241C17"    # deepest shade (film strip)
+# Palette (same values as public/assets/css/site.css) ------------------------
+CERULEAN = "#4484CE"
+CERULEAN_DEEP = "#2F6DB5"  # cerulean for lettering on light backgrounds (contrast)
+ALUMINIUM = "#D9D9D9"
+LIGHT = "#F9CF00"      # yellow
+TANGERINE = "#F19F4D"
+INK = "#0D0D0D"        # near-black page background
+WHITE = "#FFFFFF"
 
-STAR = "\u2726"      # four-pointed sparkle, drawn by hand (not in the font)
-STAR_ADVANCE = 0.78  # em
+STAR = "✦"        # four-pointed sparkle, drawn by hand (not in the font)
+STAR_ADVANCE = 0.62    # em
 
 
 # Fonts ----------------------------------------------------------------------
-# style -> (file names Georgia may have on Windows/macOS/Linux, Gelasio file)
-FONT_FILES = {
-    "regular": (("georgia.ttf", "Georgia.ttf"), "Gelasio-Regular.latin.woff2"),
-    "bold": (("georgiab.ttf", "Georgia Bold.ttf", "Georgia_Bold.ttf"), "Gelasio-Bold.latin.woff2"),
-    "italic": (("georgiai.ttf", "Georgia Italic.ttf", "Georgia_Italic.ttf"), "Gelasio-Italic.latin.woff2"),
-    "bolditalic": (("georgiaz.ttf", "Georgia Bold Italic.ttf", "Georgia_Bold_Italic.ttf"),
-                   "Gelasio-BoldItalic.latin.woff2"),
-}
-FONT_SEARCH_DIRS = [
-    Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts",
-    Path.home() / "AppData/Local/Microsoft/Windows/Fonts",
-    Path("/System/Library/Fonts/Supplemental"), Path("/Library/Fonts"), Path.home() / "Library/Fonts",
-    Path("/usr/share/fonts/truetype/msttcorefonts"), Path("/usr/share/fonts/TTF"),
-    Path.home() / ".fonts", Path.home() / ".local/share/fonts",
-]
-
-
-def find_georgia() -> dict[str, Path] | None:
-    found = {}
-    for style, (names, _) in FONT_FILES.items():
-        for d in FONT_SEARCH_DIRS:
-            hit = next((d / n for n in names if (d / n).is_file()), None)
-            if hit:
-                found[style] = hit
-                break
-    return found if len(found) == len(FONT_FILES) else None
-
-
-FONT_PATHS: dict[str, Path] = {}
-
-
-def choose_font(choice: str) -> str:
-    georgia = find_georgia() if choice in ("auto", "georgia") else None
-    if choice == "georgia" and not georgia:
-        raise SystemExit("Georgia (regular, bold, italic, bold italic) was not found on this computer.")
-    if georgia:
-        FONT_PATHS.update(georgia)
-        return "Georgia"
-    FONT_PATHS.update({s: FONT_DIR / g for s, (_, g) in FONT_FILES.items()})
-    return "Gelasio (Georgia-compatible fallback)"
-
-
 @dataclass(frozen=True)
 class Style:
-    face: str  # regular | bold | italic | bolditalic
+    file: str
 
 
-REGULAR = Style("regular")
-BOLD = Style("bold")
-ITALIC = Style("italic")
-BOLD_ITALIC = Style("bolditalic")
+BOLD = Style("RobotoCondensed-Bold.latin.woff2")
+HEAVY = Style("RobotoCondensed-ExtraBold.latin.woff2")
 
 
 # Image description ----------------------------------------------------------
@@ -154,43 +103,58 @@ def L(*runs: Run, size: float, indent: float = 0.0, tracking: float = 0.0) -> Li
     return Line(list(runs), size, indent, tracking)
 
 
+def Y(text: str, size: float = 96) -> Line:
+    """One line of the hero statement, in yellow."""
+    return L(Run(text, HEAVY, LIGHT), size=size)
+
+
+HERO_ALT = "Portraits. Families. Graduates. Design and print. Made to be seen."
+
 IMAGES: list[Image] = [
-    # Band of large words used as a moving ribbon (decorative)
+    # Hero statement: wide screens (three lines) and phones (six lines)
+    Image("hero-statement-wide", HERO_ALT, [
+        Y("PORTRAITS. FAMILIES."), Y("GRADUATES. DESIGN AND"), Y("PRINT. MADE TO BE SEEN."),
+    ], leading=0.98),
+    Image("hero-statement-narrow", HERO_ALT, [
+        Y("PORTRAITS."), Y("FAMILIES."), Y("GRADUATES."),
+        Y("DESIGN AND"), Y("PRINT. MADE"), Y("TO BE SEEN."),
+    ], leading=0.98),
+
+    # Ribbon of large words (decorative)
     Image("band", "Design, Print, Photograph", [
-        L(Run("Design", BOLD, SAND), Run(f" {STAR} ", BOLD, CAMEL),
-          Run("Print", BOLD, SAND), Run(f" {STAR} ", BOLD, CAMEL),
-          Run("Photograph", ITALIC, SAND), Run(f" {STAR} ", BOLD, CAMEL),
+        L(Run("DESIGN", HEAVY, WHITE), Run(f" {STAR} ", HEAVY, LIGHT),
+          Run("PRINT", HEAVY, WHITE), Run(f" {STAR} ", HEAVY, LIGHT),
+          Run("PHOTOGRAPH", HEAVY, WHITE), Run(f" {STAR} ", HEAVY, LIGHT),
           size=80),
     ], pad=0, hbox="advance"),
 
     # Section headings
-    Image("h-design-print", "Design & Print", [
-        L(Run("Design ", BOLD, ESPRESSO), Run("&", BOLD_ITALIC, MOCHA),
-          Run(" Print", BOLD, ESPRESSO), size=104),
-    ]),
     Image("h-photography", "Photography", [
-        L(Run("Photography", ITALIC, IVORY), size=112),
+        L(Run("PHOTOGRAPHY", HEAVY, TANGERINE), size=120),
+    ]),
+    Image("h-recent-work", "Recent work", [
+        L(Run("RECENT", HEAVY, LIGHT), size=120),
+        L(Run("WORK", HEAVY, LIGHT), size=120),
+    ], leading=0.92),
+    Image("h-design-print", "Design + Print", [
+        L(Run("DESIGN ", HEAVY, INK), Run("+", HEAVY, CERULEAN_DEEP), Run(" PRINT", HEAVY, INK), size=112),
     ]),
     Image("h-one-studio", "Shoot it. Design it. Print it.", [
-        L(Run("Shoot it", BOLD, ESPRESSO), Run(".", BOLD, CAMEL),
-          Run(" Design it", ITALIC, MOCHA), Run(".", ITALIC, CAMEL), size=88),
-        L(Run("Print it", BOLD, ESPRESSO), Run(".", BOLD, CAMEL), size=88),
-    ], leading=1.1),
-    Image("h-contact", "Let\u2019s make something.", [
-        L(Run("Let\u2019s make", BOLD, IVORY), size=108),
-        L(Run("something", ITALIC, IVORY), Run(".", ITALIC, OAT), size=108, indent=2),
-    ], leading=1.05),
+        L(Run("SHOOT IT. ", HEAVY, INK), Run("DESIGN IT.", HEAVY, WHITE), size=100),
+        L(Run("PRINT IT.", HEAVY, INK), size=100),
+    ], leading=0.95),
+    Image("h-contact", "Let’s make something.", [
+        L(Run("LET’S MAKE", HEAVY, INK), size=120),
+        L(Run("SOMETHING.", HEAVY, INK), size=120),
+    ], leading=0.92),
 
     # Large step numerals (decorative; the steps are a numbered list)
-    Image("n-01", "01", [L(Run("01", ITALIC, CAMEL), size=120)], pad=2, vbox="line"),
-    Image("n-02", "02", [L(Run("02", ITALIC, CAMEL), size=120)], pad=2, vbox="line"),
-    Image("n-03", "03", [L(Run("03", ITALIC, CAMEL), size=120)], pad=2, vbox="line"),
+    Image("n-01", "01", [L(Run("01", HEAVY, WHITE), size=120)], pad=2),
+    Image("n-02", "02", [L(Run("02", HEAVY, WHITE), size=120)], pad=2),
+    Image("n-03", "03", [L(Run("03", HEAVY, WHITE), size=120)], pad=2),
 
     # 404 page
-    Image("t-404", "404", [
-        L(Run("4", BOLD, ESPRESSO), Run("0", ITALIC, CAMEL),
-          Run("4", BOLD, ESPRESSO), size=200),
-    ]),
+    Image("t-404", "404", [L(Run("404", HEAVY, LIGHT), size=220)]),
 ]
 
 
@@ -200,7 +164,7 @@ _FONTS: dict[Style, tuple[hb.Font, int]] = {}
 
 def hb_font(style: Style) -> tuple[hb.Font, int]:
     if style not in _FONTS:
-        tt = TTFont(FONT_PATHS[style.face])
+        tt = TTFont(FONT_DIR / style.file)
         upem = tt["head"].unitsPerEm
         tt.flavor = None  # woff2 -> plain sfnt bytes for HarfBuzz
         buf = io.BytesIO()
@@ -249,7 +213,7 @@ def draw_line(line: Line, baseline_y: float):
                     draw_star(pens.setdefault(fill, RecordingPen()), x, baseline_y, line.size)
                     x += STAR_ADVANCE * line.size
                     continue
-                raise SystemExit(f"{FONT_PATHS[style.face].name} has no glyph for {bad!r} (U+{ord(bad):04X})")
+                raise SystemExit(f"{style.file} has no glyph for {bad!r} (U+{ord(bad):04X})")
             fill = fill_for(info.cluster, spans)
             pen = pens.setdefault(fill, RecordingPen())
             ox = x + pos.x_offset * scale
@@ -261,11 +225,11 @@ def draw_line(line: Line, baseline_y: float):
 
 
 def draw_star(pen, x: float, baseline_y: float, size: float) -> None:
-    """Four-pointed sparkle centered on the lower-case x-height."""
-    r = size * 0.26           # outer radius
-    k = size * 0.045          # waist (how thin the arms get)
+    """Four-pointed sparkle centered on the capital letters."""
+    r = size * 0.25           # outer radius
+    k = size * 0.04           # waist (how thin the arms get)
     cx = x + STAR_ADVANCE * size / 2
-    cy = baseline_y - size * 0.25
+    cy = baseline_y - size * 0.355
     pen.moveTo((cx, cy - r))
     pen.qCurveTo((cx + k, cy - k), (cx + r, cy))
     pen.qCurveTo((cx + k, cy + k), (cx, cy + r))
@@ -312,7 +276,7 @@ def render(img: Image) -> tuple[str, float, float]:
         first, last = img.lines[0].size, img.lines[-1].size
         y0, y1 = first * 0.8 - first * 0.74, y + last * 0.27
 
-    # Centre-align by shifting whole lines (re-draw shift via transform)
+    # Center-align by shifting whole lines
     by_fill: dict[str, list[tuple[RecordingPen, float]]] = {}
     for (pens, _), lb in zip(line_pens, widths):
         shift = 0.0
@@ -342,143 +306,35 @@ def render(img: Image) -> tuple[str, float, float]:
     return svg, w, h
 
 
-def glyph_path(text: str, style: Style, size: float, cx: float, cy: float) -> str:
-    """Path data for `text`, with its ink box centered on (cx, cy)."""
-    pens, _ = draw_line(L(Run(text, style, "#000"), size=size), 0.0)
-    rec = pens["#000"]
-    b = BoundsPen(None)
-    rec.replay(b)
-    x0, y0, x1, y1 = b.bounds
-    sp = CompactPathPen()
-    rec.replay(TransformPen(sp, (1, 0, 0, 1, cx - (x0 + x1) / 2, cy - (y0 + y1) / 2)))
-    return sp.getCommands()
-
-
-def svg_doc(w: int, h: int, title: str | None, body: str) -> str:
-    head = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}"'
-    if title:
-        return head + f' role="img"><title>{escape(title)}</title>' + body + "</svg>\n"
-    return head + ' aria-hidden="true">' + body + "</svg>\n"
-
-
-def hero_art() -> str:
-    """Arch with a striped 70s sun and a giant ampersand: the '&' that joins
-    PW&i Studio and Hoffman Images. Decorative."""
-    w, h = 520, 640
-    amp = glyph_path("&", BOLD, 380, 262, 350)
-    stripes = "".join(
-        f'<rect x="96" y="{y}" width="328" height="{t}" fill="{MOCHA}"/>'
-        for y, t in ((352, 7), (380, 10), (411, 13), (445, 16)))
-    body = (
-        # arch
-        f'<path fill="{MOCHA}" d="M0 640V260A260 260 0 0 1 520 260V640Z"/>'
-        # sun, cut by horizontal stripes
-        f'<circle cx="260" cy="330" r="158" fill="{CAMEL}"/>' + stripes +
-        # horizon lines
-        f'<rect x="0" y="488" width="520" height="10" fill="{OAT}"/>'
-        f'<rect x="0" y="512" width="520" height="6" fill="{OAT}" opacity=".6"/>'
-        # ampersand
-        f'<path fill="{IVORY}" d="{amp}"/>'
-        # printer's registration mark, bottom left
-        f'<g fill="none" stroke="{IVORY}" stroke-width="3">'
-        f'<circle cx="58" cy="584" r="16"/><path d="M58 556V612M30 584H86"/></g>'
-        # camera aperture, bottom right
-        f'<g transform="translate(462 584)"><circle r="22" fill="none" stroke="{IVORY}" stroke-width="3"/>'
-        + "".join(f'<path d="M0 0L18 -6" stroke="{IVORY}" stroke-width="3" transform="rotate({a})"/>'
-                  for a in range(0, 360, 60)) +
-        '</g>'
-    )
-    return svg_doc(w, h, None, body)
-
-
-def favicon() -> str:
-    """Espresso tile with a linen ampersand."""
-    amp = glyph_path("&", BOLD, 44, 32, 32.5)
-    body = (f'<rect width="64" height="64" rx="14" fill="{ESPRESSO}"/>'
-            f'<path fill="{LINEN}" d="{amp}"/>')
-    return svg_doc(64, 64, "PW&i Studio + Hoffman Images", body)
-
-
-
-
+# Illustrations --------------------------------------------------------------
 def swatch_fan() -> str:
     """A printer's color-swatch fan in the site colors. Decorative."""
     chips = []
-    for angle, color in ((-33, ESPRESSO), (-11, LINEN), (11, CAMEL), (33, MOCHA)):
+    for angle, color in ((-33, INK), (-11, CERULEAN), (11, LIGHT), (33, TANGERINE)):
         chips.append(
             f'<g transform="translate(210 334) rotate({angle})">'
-            f'<rect x="-46" y="-270" width="92" height="290" rx="10" fill="{IVORY}" '
-            f'stroke="{ESPRESSO}" stroke-opacity=".14" stroke-width="1.5"/>'
-            f'<path fill="{color}" d="M-46 -260a10 10 0 0 1 10-10h72a10 10 0 0 1 10 10v160h-92z"/>'
-            f'<rect x="-34" y="-86" width="52" height="7" rx="3.5" fill="{ESPRESSO}" fill-opacity=".55"/>'
-            f'<rect x="-34" y="-72" width="34" height="6" rx="3" fill="{ESPRESSO}" fill-opacity=".28"/>'
+            f'<rect x="-46" y="-270" width="92" height="290" rx="6" fill="{WHITE}" '
+            f'stroke="{INK}" stroke-opacity=".18" stroke-width="1.5"/>'
+            f'<path fill="{color}" d="M-46 -264a6 6 0 0 1 6-6h80a6 6 0 0 1 6 6v164h-92z"/>'
+            f'<rect x="-34" y="-86" width="52" height="7" rx="1" fill="{INK}" fill-opacity=".6"/>'
+            f'<rect x="-34" y="-72" width="34" height="6" rx="1" fill="{INK}" fill-opacity=".3"/>'
             '</g>')
-    rivet = (f'<circle cx="210" cy="334" r="10" fill="{CAMEL}"/>'
-             f'<circle cx="210" cy="334" r="3.5" fill="{ESPRESSO}"/>')
+    rivet = (f'<circle cx="210" cy="334" r="10" fill="{INK}"/>'
+             f'<circle cx="210" cy="334" r="3.5" fill="{ALUMINIUM}"/>')
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 50 420 340" '
             f'width="420" height="340" aria-hidden="true">' + "".join(chips) + rivet + "</svg>\n")
 
 
-def film_strip() -> str:
-    """A strip of 35 mm film with four flat-illustration frames:
-    portrait, landscape, product, and a camera aperture. Decorative."""
-    import math
-    holes = "".join(
-        f'<rect x="{x}" y="{y}" width="22" height="16" rx="4" fill="{ESPRESSO}"/>'
-        for x in range(16, 1000, 40) for y in (12, 232))
-    f1 = (  # portrait
-        f'<rect x="16" y="40" width="230" height="180" fill="{CAMEL}"/>'
-        f'<circle cx="131" cy="80" r="70" fill="{IVORY}" fill-opacity=".22"/>'
-        f'<circle cx="131" cy="112" r="33" fill="{IVORY}"/>'
-        f'<path fill="{IVORY}" d="M71 220C71 172 99 154 131 154S191 172 191 220Z"/>')
-    f2 = (  # landscape
-        f'<rect x="262" y="40" width="230" height="180" fill="{LINEN}"/>'
-        f'<circle cx="424" cy="98" r="26" fill="{CAMEL}"/>'
-        f'<path fill="{TAUPE}" d="M262 176Q318 122 378 160T492 148V220H262Z"/>'
-        f'<path fill="{MOCHA}" d="M262 202Q340 172 420 196T492 190V220H262Z"/>')
-    f3 = (  # product
-        f'<rect x="508" y="40" width="230" height="180" fill="{MOCHA}"/>'
-        f'<rect x="508" y="186" width="230" height="34" fill="{TAUPE}"/>'
-        f'<ellipse cx="623" cy="190" rx="50" ry="7" fill="{SHADOW}" fill-opacity=".4"/>'
-        f'<rect x="611" y="72" width="24" height="30" fill="{IVORY}"/>'
-        f'<rect x="608" y="62" width="30" height="13" rx="2" fill="{CAMEL}"/>'
-        f'<path fill="{IVORY}" d="M593 190V124Q593 100 623 100T653 124V190Z"/>'
-        f'<rect x="593" y="136" width="60" height="34" fill="{CAMEL}"/>')
-    # aperture: dark ring, six blade edges, light hexagonal opening
-    cx, cy, r_in, r_out = 869, 130, 26, 66
-    hexagon = " ".join(f"{cx + r_in * math.cos(math.radians(a)):.1f} {cy + r_in * math.sin(math.radians(a)):.1f}"
-                       for a in range(0, 360, 60))
-    blades = "".join(
-        f'<path d="M{cx + r_in * math.cos(math.radians(a)):.1f} {cy + r_in * math.sin(math.radians(a)):.1f}'
-        f'L{cx + r_out * math.cos(math.radians(a + 70)):.1f} {cy + r_out * math.sin(math.radians(a + 70)):.1f}"/>'
-        for a in range(0, 360, 60))
-    f4 = (
-        f'<rect x="754" y="40" width="230" height="180" fill="{TAUPE}"/>'
-        f'<circle cx="{cx}" cy="{cy}" r="{r_out + 6}" fill="{SHADOW}"/>'
-        f'<g stroke="{OAT}" stroke-width="3" stroke-linecap="round">{blades}</g>'
-        f'<polygon points="{hexagon}" fill="{IVORY}"/>')
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 260" '
-            f'width="1000" height="260" aria-hidden="true">'
-            f'<rect width="1000" height="260" rx="6" fill="{SHADOW}"/>' + holes + f1 + f2 + f3 + f4 +
-            "</svg>\n")
-
-
 COMPOSITIONS = {
     ROOT / "public" / "assets" / "img" / "swatch-fan.svg": swatch_fan,
-    ROOT / "public" / "assets" / "img" / "film-strip.svg": film_strip,
-    ROOT / "public" / "assets" / "img" / "hero-art.svg": hero_art,
-    ROOT / "public" / "favicon.svg": favicon,
 }
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--list", action="store_true", help="print image sizes only")
-    ap.add_argument("--font", choices=("auto", "georgia", "gelasio"), default="auto",
-                    help="auto: Georgia if installed, else Gelasio (default)")
     ap.add_argument("names", nargs="*", help="only build these images")
     args = ap.parse_args(argv)
-    print("Typeface:", choose_font(args.font))
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     for img in IMAGES:
@@ -487,7 +343,7 @@ def main(argv=None) -> int:
         svg, w, h = render(img)
         if not args.list:
             (OUT_DIR / f"{img.name}.svg").write_text(svg, encoding="utf-8")
-        print(f"{img.name:20s} width={round(w)} height={round(h)}  ({len(svg.encode()) / 1024:.1f} KiB)")
+        print(f"{img.name:22s} width={round(w)} height={round(h)}  ({len(svg.encode()) / 1024:.1f} KiB)")
     if not args.names and not args.list:
         for path, build in COMPOSITIONS.items():
             svg = build()

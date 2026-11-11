@@ -7,14 +7,14 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <title>PW&amp;i Studio + Hoffman Images | Design, Print &amp; Photography</title>
-<meta name="description" content="PW&amp;i Studio designs and prints brand identities, signage and print collateral. Hoffman Images photographs portraits, products and events in our own studio. One team, from the shoot to the final print.">
+<meta name="description" content="Hoffman Images photographs families, graduates, portraits and events in our studio or on location. PW&amp;i Studio designs and prints logos, signs and print collateral. One team, from the shoot to the final print.">
 <link rel="canonical" href="https://pwistudio.com/">
-<meta name="theme-color" content="#F3EDE3">
-<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#0D0D0D">
+<meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="PW&amp;i Studio + Hoffman Images">
 <meta property="og:title" content="PW&amp;i Studio + Hoffman Images">
-<meta property="og:description" content="Graphic design, printing and studio photography under one roof.">
+<meta property="og:description" content="Photography, graphic design and printing under one roof.">
 <meta property="og:url" content="https://pwistudio.com/">
 <meta property="og:image" content="https://pwistudio.com/assets/img/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -32,15 +32,15 @@
 <header class="site-header">
   <div class="wrap site-header__inner">
     <a class="brand" href="#top">
-      <img class="brand__pwi" src="assets/logo/pwi-mark.svg" alt="PW&amp;i Studio" width="597" height="305">
+      <img class="brand__pwi" src="assets/logo/pwi-mark.svg" alt="PW&amp;i Studio" width="598" height="304">
       <span class="brand__divider"></span>
       <img class="brand__hi" src="assets/logo/hoffman-mark.svg" alt="Hoffman Images" width="479" height="465">
     </a>
     <nav class="site-nav" aria-label="Main">
       <ul>
-        <li><a href="#design">Design &amp; Print</a></li>
         <li><a href="#photography">Photography</a></li>
-        <li><a href="#studio">Studio</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#design">Design<span class="nav-more"> + Print</span></a></li>
         <li><a class="site-nav__cta" href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -49,24 +49,26 @@
 
 <main id="main">
 
-  <!-- Hero -->
+  <!-- Hero: the two logos are the page title -->
   <section class="hero">
-    <div class="wrap hero__grid">
-      <div class="hero__copy">
-        <p class="eyebrow">Graphic design &middot; Printing &middot; Photography</p>
-        <h1 class="hero__title">
-          <img class="hero__logo hero__logo--pwi" src="assets/logo/pwi-design-print.svg" alt="PW&amp;i Design + Print" width="597" height="317">
-          <span class="hero__plus">+</span>
-          <img class="hero__logo hero__logo--hi" src="assets/logo/hoffman-images.svg" alt="Hoffman Images" width="479" height="662">
-        </h1>
-        <p class="lead">Two crafts, one studio. <strong>PW&amp;i Studio</strong> designs and prints the things that carry your name. <strong>Hoffman Images</strong> makes the pictures that bring them to life.</p>
+    <div class="wrap">
+      <h1 class="hero__title">
+        <img class="hero__logo hero__logo--pwi" src="assets/logo/pwi-design-print.svg" alt="PW&amp;i Design + Print" width="597" height="317">
+        <span class="hero__plus">+</span>
+        <img class="hero__logo hero__logo--hi" src="assets/logo/hoffman-images-reverse.svg" alt="Hoffman Images" width="479" height="662">
+      </h1>
+      <p class="hero__statement">
+        <picture>
+          <source media="(max-width: 40em)" srcset="assets/type/hero-statement-narrow.svg" width="519" height="549">
+          <img src="assets/type/hero-statement-wide.svg" alt="Portraits. Families. Graduates. Design and print. Made to be seen." width="1021" height="266">
+        </picture>
+      </p>
+      <div class="hero__aside">
+        <p>Two crafts, one studio. <strong>Hoffman Images</strong> makes the pictures. <strong>PW&amp;i Studio</strong> designs and prints the things that carry your name.</p>
         <p class="actions">
-          <a class="btn btn--solid" href="#contact">Start a project</a>
-          <a class="btn btn--ghost" href="#photography">Book a photo session</a>
+          <a class="btn btn--primary" href="#contact">Book a session</a>
+          <a class="btn btn--ghost" href="#design">Design + print</a>
         </p>
-      </div>
-      <div class="hero__art">
-        <img src="assets/img/hero-art.svg" alt="" width="520" height="640">
       </div>
     </div>
   </section>
@@ -74,25 +76,130 @@
   <!-- Ribbon of large lettering (decorative) -->
   <div class="band" aria-hidden="true">
     <div class="band__track">
-      <img src="assets/type/band.svg" alt="" width="1232" height="79">
-      <img src="assets/type/band.svg" alt="" width="1232" height="79">
-      <img src="assets/type/band.svg" alt="" width="1232" height="79">
-      <img src="assets/type/band.svg" alt="" width="1232" height="79">
-      <img src="assets/type/band.svg" alt="" width="1232" height="79">
-      <img src="assets/type/band.svg" alt="" width="1232" height="79">
+      <img src="assets/type/band.svg" alt="" width="1172" height="58">
+      <img src="assets/type/band.svg" alt="" width="1172" height="58">
+      <img src="assets/type/band.svg" alt="" width="1172" height="58">
+      <img src="assets/type/band.svg" alt="" width="1172" height="58">
+      <img src="assets/type/band.svg" alt="" width="1172" height="58">
+      <img src="assets/type/band.svg" alt="" width="1172" height="58">
     </div>
   </div>
 
-  <!-- PW&i Studio -->
-  <section class="section" id="design">
+  <!-- Hoffman Images -->
+  <section class="photo" id="photography">
+    <div class="wrap section-head">
+      <div>
+        <p class="eyebrow">Hoffman Images</p>
+        <h2 class="display"><img src="assets/type/h-photography.svg" alt="Photography" width="763" height="96"></h2>
+      </div>
+      <p class="section-head__note">Families, graduates, portraits and events, in our own studio or out on location.</p>
+    </div>
+
+    <div class="split">
+      <div class="split__panel split__panel--block">
+        <div class="photo-card">
+          <picture>
+            <source type="image/webp" srcset="assets/photos/family-holiday-480.webp 480w, assets/photos/family-holiday-960.webp 960w, assets/photos/family-holiday-1440.webp 1440w" sizes="(min-width: 60em) 26rem, 85vw">
+            <img src="assets/photos/family-holiday-960.jpg" alt="A smiling family of four holding their small dog in front of a snowy Christmas tree" width="960" height="1280" loading="lazy" decoding="async">
+          </picture>
+          <div class="photo-card__caption">
+            <h3>Families &amp; holidays</h3>
+            <p>Holiday sessions, family portraits and the moments worth framing.</p>
+            <a class="text-link" href="#contact">Book a session</a>
+          </div>
+        </div>
+      </div>
+      <div class="split__panel split__panel--photo">
+        <picture>
+          <source type="image/webp" srcset="assets/photos/graduate-studio-480.webp 480w, assets/photos/graduate-studio-960.webp 960w, assets/photos/graduate-studio-1373.webp 1373w" sizes="(min-width: 60em) 50vw, 100vw">
+          <img src="assets/photos/graduate-studio-960.jpg" alt="A smiling graduate in a red cap and gown, seated in the studio" width="960" height="1432" loading="lazy" decoding="async">
+        </picture>
+        <div class="split__caption">
+          <h3>Seniors &amp; graduates</h3>
+          <p>Cap-and-gown and senior portraits in the studio or around town.</p>
+          <a class="text-link" href="#contact">Book a session</a>
+        </div>
+      </div>
+    </div>
+
     <div class="wrap">
-      <div class="intro">
-        <div class="intro__text">
+      <ul class="services" role="list">
+        <li>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>
+          <h3>Portraits &amp; headshots</h3>
+          <p>Professional headshots and personal portraits, with relaxed direction so you look like yourself.</p>
+        </li>
+        <li>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8.5" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M15.5 14.6c2.6-.4 4.8 1.4 5.5 4.4"/></svg>
+          <h3>Families &amp; milestones</h3>
+          <p>Holidays, graduations, couples and the moments worth framing, in the studio or somewhere that matters to you.</p>
+        </li>
+        <li>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12V4h8l10 10-7 7z"/><circle cx="7.5" cy="8" r="1.5"/></svg>
+          <h3>Product &amp; commercial</h3>
+          <p>Clean catalog shots and styled scenes for your shop, menu, website or next print run.</p>
+        </li>
+        <li>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          <h3>Events</h3>
+          <p>Openings, celebrations and company events, documented from start to finish.</p>
+        </li>
+        <li>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4h14l-3 7H8z"/><path d="M12 11v10M8 21h8"/></svg>
+          <h3>Studio sessions</h3>
+          <p>A dedicated space with backdrops and controlled lighting, so every session starts ready.</p>
+        </li>
+        <li>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="1"/><rect x="6.5" y="6.5" width="11" height="11"/><path d="m6.5 15 3.5-3.5 2.5 2.5 2-2 3 3"/></svg>
+          <h3>Prints &amp; wall art</h3>
+          <p>Your favorite frames printed in-house and finished, ready to hang or give.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Recent work -->
+  <section class="work" id="work">
+    <div class="wrap work__grid">
+      <h2 class="display work__title"><img src="assets/type/h-recent-work.svg" alt="Recent work" width="393" height="206"></h2>
+      <p class="work__note">A few favorite frames from recent sessions and adventures.</p>
+      <div class="work__item work__item--a">
+        <picture>
+          <source type="image/webp" srcset="assets/photos/city-rainbow-480.webp 480w, assets/photos/city-rainbow-960.webp 960w, assets/photos/city-rainbow-1440.webp 1440w" sizes="(min-width: 60em) 40vw, 100vw">
+          <img src="assets/photos/city-rainbow-960.jpg" alt="A rainbow over the bay behind a downtown skyline and winding freeway ramps, under storm clouds" width="960" height="720" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <div class="work__item work__item--b">
+        <picture>
+          <source type="image/webp" srcset="assets/photos/graduates-downtown-480.webp 480w, assets/photos/graduates-downtown-960.webp 960w, assets/photos/graduates-downtown-1440.webp 1440w" sizes="(min-width: 60em) 32vw, 50vw">
+          <img src="assets/photos/graduates-downtown-960.jpg" alt="Two graduates in navy caps and gowns sharing a kiss on a city walkway" width="960" height="1280" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <div class="work__item work__item--c">
+        <picture>
+          <source type="image/webp" srcset="assets/photos/dunes-sunset-480.webp 480w, assets/photos/dunes-sunset-960.webp 960w, assets/photos/dunes-sunset-1440.webp 1440w" sizes="(min-width: 60em) 40vw, 100vw">
+          <img src="assets/photos/dunes-sunset-960.jpg" alt="A lone figure on the crest of a sand dune under a hazy sunset" width="960" height="720" loading="lazy" decoding="async">
+        </picture>
+      </div>
+      <div class="work__item work__item--d">
+        <picture>
+          <source type="image/webp" srcset="assets/photos/siblings-holiday-480.webp 480w, assets/photos/siblings-holiday-960.webp 960w, assets/photos/siblings-holiday-1440.webp 1440w" sizes="(min-width: 60em) 32vw, 50vw">
+          <img src="assets/photos/siblings-holiday-960.jpg" alt="Two children sitting together on a white blanket in front of a lit Christmas tree and wrapped presents" width="960" height="1280" loading="lazy" decoding="async">
+        </picture>
+      </div>
+    </div>
+  </section>
+
+  <!-- PW&i Studio -->
+  <section class="design" id="design">
+    <div class="wrap">
+      <div class="section-head section-head--art">
+        <div>
           <p class="eyebrow">PW&amp;i Studio</p>
-          <h2 class="display"><img src="assets/type/h-design-print.svg" alt="Design &amp; Print" width="783" height="109"></h2>
+          <h2 class="display"><img src="assets/type/h-design-print.svg" alt="Design + Print" width="733" height="90"></h2>
           <p class="lead">From the first sketch to the final trim. We build identities that hold together, then print them with care, on the paper, finish and format that suit the job.</p>
         </div>
-        <img class="intro__art intro__art--fan" src="assets/img/swatch-fan.svg" alt="" width="420" height="340">
+        <img class="design__fan" src="assets/img/swatch-fan.svg" alt="" width="420" height="340">
       </div>
 
       <ul class="cards" role="list">
@@ -130,80 +237,26 @@
     </div>
   </section>
 
-  <!-- Hoffman Images -->
-  <section class="section section--dark" id="photography">
-    <div class="wrap">
-      <div class="intro intro--single">
-        <div class="intro__text">
-          <p class="eyebrow">Hoffman Images</p>
-          <h2 class="display"><img src="assets/type/h-photography.svg" alt="Photography" width="665" height="119"></h2>
-          <p class="lead">Light, patience and a good eye. Hoffman Images photographs people, products and places, in our own studio or out on location.</p>
-        </div>
-      </div>
-
-      <div class="filmstrip">
-        <img src="assets/img/film-strip.svg" alt="" width="1000" height="260">
-      </div>
-
-      <ul class="cards cards--dark" role="list">
-        <li class="card">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>
-          <h3>Portraits &amp; headshots</h3>
-          <p>Professional headshots and personal portraits, with relaxed direction so you look like yourself.</p>
-        </li>
-        <li class="card">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="9" cy="8.5" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M15.5 14.6c2.6-.4 4.8 1.4 5.5 4.4"/></svg>
-          <h3>Family &amp; milestones</h3>
-          <p>Families, graduates, couples and the moments worth framing, in the studio or somewhere that matters to you.</p>
-        </li>
-        <li class="card">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12V4h8l10 10-7 7z"/><circle cx="7.5" cy="8" r="1.5"/></svg>
-          <h3>Product &amp; commercial</h3>
-          <p>Clean catalog shots and styled scenes for your shop, menu, website or next print run.</p>
-        </li>
-        <li class="card">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-          <h3>Events</h3>
-          <p>Openings, celebrations and company events, documented from start to finish.</p>
-        </li>
-        <li class="card">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4h14l-3 7H8z"/><path d="M12 11v10M8 21h8"/></svg>
-          <h3>Studio sessions</h3>
-          <p>A dedicated space with backdrops and controlled lighting, so every session starts ready.</p>
-        </li>
-        <li class="card">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="1"/><rect x="6.5" y="6.5" width="11" height="11"/><path d="m6.5 15 3.5-3.5 2.5 2.5 2-2 3 3"/></svg>
-          <h3>Prints &amp; wall art</h3>
-          <p>Your favorite frames printed in-house and finished, ready to hang or hand over.</p>
-        </li>
-      </ul>
-    </div>
-  </section>
-
   <!-- Together -->
-  <section class="section" id="studio">
+  <section class="studio" id="studio">
     <div class="wrap">
-      <div class="intro intro--single">
-        <div class="intro__text">
-          <p class="eyebrow">The Studio: under one roof</p>
-          <h2 class="display"><img src="assets/type/h-one-studio.svg" alt="Shoot it. Design it. Print it." width="773" height="173"></h2>
-          <p class="lead">The camera, the design desk and the printer are in the same building, so nothing gets lost between vendors. One conversation, one schedule and one consistent look from the first photo to the finished piece.</p>
-        </div>
-      </div>
+      <p class="eyebrow">Under one roof</p>
+      <h2 class="display"><img src="assets/type/h-one-studio.svg" alt="Shoot it. Design it. Print it." width="854" height="176"></h2>
+      <p class="lead">The camera, the design desk and the printer are in the same building, so nothing gets lost between vendors. One conversation, one schedule and one consistent look from the first photo to the finished piece.</p>
 
       <ol class="steps" role="list">
         <li class="step">
-          <img class="step__num" src="assets/type/n-01.svg" alt="" width="117" height="125">
+          <img class="step__num" src="assets/type/n-01.svg" alt="" width="103" height="92">
           <h3>Capture</h3>
           <p>Hoffman Images photographs your people, products or space, in the studio or on site.</p>
         </li>
         <li class="step">
-          <img class="step__num" src="assets/type/n-02.svg" alt="" width="128" height="125">
+          <img class="step__num" src="assets/type/n-02.svg" alt="" width="116" height="92">
           <h3>Create</h3>
           <p>PW&amp;i Studio turns those images into a brand, a layout or a full campaign.</p>
         </li>
         <li class="step">
-          <img class="step__num" src="assets/type/n-03.svg" alt="" width="130" height="125">
+          <img class="step__num" src="assets/type/n-03.svg" alt="" width="115" height="92">
           <h3>Produce</h3>
           <p>We proof, print and finish the work here, and check the color against the original.</p>
         </li>
@@ -212,12 +265,12 @@
   </section>
 
   <!-- Contact -->
-  <section class="section section--dark section--contact" id="contact">
+  <section class="contact-section" id="contact">
     <div class="wrap contact">
       <div class="contact__text">
         <p class="eyebrow">Contact</p>
-        <h2 class="display"><img src="assets/type/h-contact.svg" alt="Let&#8217;s make something." width="594" height="238"></h2>
-        <p class="lead">Tell us what you have in mind: a logo, a print run, a portrait session, or all three. We&#8217;ll get back to you with ideas, timing and a quote.</p>
+        <h2 class="display"><img src="assets/type/h-contact.svg" alt="Let&#8217;s make something." width="636" height="210"></h2>
+        <p class="lead">Tell us what you have in mind: a portrait session, a logo, a print run, or all three. We&#8217;ll get back to you with ideas, timing and a quote.</p>
       </div>
       <div class="contact-card">
         <p class="contact-card__label">Email the studio</p>
@@ -225,8 +278,8 @@
         <p class="contact-card__email"><a href="mailto:hello@pwistudio.com">hello@pwistudio.com</a></p>
         <dl class="contact-card__list">
           <div><dt>Studio visits</dt><dd>By appointment</dd></div>
-          <div><dt>Design &amp; print</dt><dd>Logos, layouts, signage and print runs</dd></div>
-          <div><dt>Photography</dt><dd>Portrait, product and event bookings</dd></div>
+          <div><dt>Photography</dt><dd>Family, graduate, portrait and event bookings</dd></div>
+          <div><dt>Design + print</dt><dd>Logos, layouts, signage and print runs</dd></div>
         </dl>
       </div>
     </div>
@@ -239,20 +292,21 @@
     <div class="site-footer__brand">
       <div class="site-footer__logos">
         <img class="site-footer__pwi" src="assets/logo/pwi-design-print.svg" alt="PW&amp;i Design + Print" width="597" height="317">
-        <img class="site-footer__hi" src="assets/logo/hoffman-images.svg" alt="Hoffman Images" width="479" height="662">
+        <img class="site-footer__hi" src="assets/logo/hoffman-images-reverse.svg" alt="Hoffman Images" width="479" height="662">
       </div>
-      <p>PW&amp;i Studio + Hoffman Images<br>Graphic design, printing &amp; photography</p>
+      <p>PW&amp;i Studio + Hoffman Images<br>Photography, graphic design &amp; printing</p>
     </div>
     <nav class="site-footer__nav" aria-label="Footer">
       <ul>
-        <li><a href="#design">Design &amp; Print</a></li>
         <li><a href="#photography">Photography</a></li>
-        <li><a href="#studio">The Studio</a></li>
+        <li><a href="#work">Recent work</a></li>
+        <li><a href="#design">Design + Print</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
     <div class="site-footer__legal">
       <p>&copy; 2026 PW&amp;i Studio + Hoffman Images. All rights reserved.</p>
+      <p>Photographs &copy; Hoffman Images, shown with the permission of the people pictured. Please don&#8217;t reuse them.</p>
       <p>Privacy: this site sets no cookies, runs no scripts and loads nothing from anyone else.</p>
     </div>
   </div>

@@ -6,18 +6,25 @@ does not use webfonts.
 It is the home page for **PW&i Studio + Hoffman Images**: graphic design and
 printing (PW&i Studio) and studio photography (Hoffman Images).
 
-- **Palette (warm neutrals):** Linen `#F3EDE3` (background), Ivory `#FBF8F2`,
-  Sand `#E6DCCC`, Oat `#CDBDA6`, Taupe `#9C8775`, Camel `#A8835F`,
-  Mocha `#6E5646` and Espresso `#3A2E26` (text and dark sections).
-  Every text/background pair meets WCAG AA contrast; Taupe and Camel are used
-  only for decoration and large lettering.
+- **Layout:** bold, photo-led and mostly dark: a near-black hero with
+  oversized condensed headlines, a split panel (color block with an inset photo
+  beside a full-height portrait), a "Recent work" photo collage, then
+  Design + Print, the "Shoot it. Design it. Print it." process, and contact.
+- **Palette:** Cerulean `#4484CE`, Aluminium `#D9D9D9`, Light `#F9CF00`
+  (yellow) and Tangerine `#F19F4D`, on near-black `#0D0D0D`. A deeper
+  cerulean `#2F6DB5` is used where blue sits on a light background, for
+  contrast. Every text/background pair meets WCAG AA.
 - **Logos as the page title:** the PW&i Design + Print and Hoffman Images logos
-  (`public/assets/logo/`) form the main heading, header and footer.
-- **Typeface: Georgia.** All text is set in Georgia, which is already installed
-  on Windows, macOS and iOS, so nothing is downloaded (**no webfonts**). Android
-  and Linux visitors see their own serif font instead.
-- **Large lettering as images:** section headings are SVG vector outlines
-  (`public/assets/type/`), so they look the same on every device.
+  (`public/assets/logo/`) form the main heading, header and footer. On dark
+  backgrounds the Hoffman Images wordmark is shown in white.
+- **Text: a Roboto-style sans-serif, with no webfonts.** The page uses the
+  sans-serif already on each device: Roboto on Android and Chromebooks, Segoe
+  UI on Windows, San Francisco on iPhone, iPad and Mac. Nothing is downloaded.
+- **Large lettering as images:** the big headlines are SVG vector outlines of
+  Roboto Condensed (`public/assets/type/`), so they look the same everywhere.
+- **Photos:** six Hoffman Images photos (`public/assets/photos/`), used with
+  the subjects' photography releases, served as WebP with JPEG fallbacks and
+  stripped of all metadata.
 - **No JavaScript, no cookies, no forms, no third-party requests** (no CDNs,
   analytics, embeds or font services).
 
@@ -31,6 +38,7 @@ printing (PW&i Studio) and studio photography (Hoffman Images).
 | HTTPS forced, plus HSTS | Directory listings off; server version hidden |
 | Can't be framed (clickjacking), `nosniff`, `no-referrer`, all browser features (camera, location...) disabled | Server-side script handlers removed from the web root |
 | Cross-origin isolation (COOP, COEP, CORP) | `tools/audit_site.py` blocks risky changes before deploy |
+| Photos carry no hidden location or camera data | |
 
 SVGs are generated, not hand-edited, and contain only plain shapes: no
 `<script>`, `<style>`, links or embedded fonts.
@@ -41,9 +49,11 @@ SVGs are generated, not hand-edited, and contain only plain shapes: no
 public/                 <- the web root: upload only this folder
   index.html, 404.html
   assets/css/site.css   the only stylesheet
-  assets/logo/*.svg     the two logos (full versions + compact header marks)
+  assets/logo/*.svg     the two logos (full versions, compact header marks,
+                        white-wordmark Hoffman Images for dark backgrounds)
+  assets/photos/*       photos: WebP at 480/960/1440 px + one JPEG fallback
   assets/type/*.svg     large lettering (generated)
-  assets/img/*          illustrations (generated) + social preview image
+  assets/img/*          swatch-fan illustration (generated) + social preview image
   favicon.svg/.ico, apple-touch-icon.png, robots.txt, sitemap.xml
   .well-known/security.txt
   .htaccess             Apache config (headers, HTTPS, access rules)
@@ -52,10 +62,11 @@ server/
   nginx/                nginx server block + headers snippet
   Caddyfile             Caddy config
 tools/
-  build_graphics.py     regenerates the lettering/illustrations (needs Python libs)
+  prepare_photos.py     strips metadata and makes web sizes of new photos
+  build_graphics.py     regenerates the lettering and illustration
   render_png.mjs        regenerates favicon.ico, touch icon, social image (needs Playwright)
   audit_site.py         security audit, standard library only
-  fonts/                Gelasio (SIL OFL), Georgia-compatible fallback, build time only
+  fonts/                Roboto Condensed (SIL OFL), used at build time only
 ```
 
 ## Deploying
@@ -96,22 +107,28 @@ run.
 
 ## Editing
 
+One-time setup for the Python tools:
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -r tools/requirements.txt
+```
+
 - **Text:** edit `public/index.html` directly.
-- **Large lettering:** the headings are drawn in Georgia when the computer
-  running the script has it (any Mac or Windows PC). Otherwise the script
-  uses Gelasio, a free typeface made to match Georgia's spacing, which is how
-  the current images were made. To redraw them in Georgia itself, run the
-  script on a Mac or PC. Edit the `IMAGES` list in `tools/build_graphics.py`,
-  then:
+- **Adding or swapping photos:** only use photos you have a signed release for.
 
   ```sh
-  python3 -m venv .venv
-  .venv/bin/pip install -r tools/requirements.txt
-  .venv/bin/python tools/build_graphics.py
+  .venv/bin/python tools/prepare_photos.py ~/Pictures/new-photo.jpg short-name
   ```
 
-  Copy the printed `width`/`height` into the matching `<img>` tag.
-  Keep the `alt` text identical to the lettering.
+  This turns the photo upright, removes **all** metadata (GPS location,
+  camera details), saves web sizes in `public/assets/photos/` and prints the
+  `<picture>` markup to paste into the page. Write a plain description of
+  the photo in its `alt` text (don't name the people in it).
+- **Large lettering:** edit the `IMAGES` list in `tools/build_graphics.py`, run
+  `.venv/bin/python tools/build_graphics.py`, then copy the printed
+  `width`/`height` into the matching `<img>` tag. Keep the `alt` text identical
+  to the lettering.
 - **Favicon / social image:** `node tools/render_png.mjs` (instructions in the file).
 - **Logos:** the files in `public/assets/logo/` were traced into vector shapes
   from screenshots of the Canva designs. For exact originals, export each logo
@@ -120,10 +137,6 @@ run.
   `width`/`height` in the `<img>` tags if the proportions change. Run
   `python3 tools/audit_site.py` afterward: Canva SVGs sometimes contain
   embedded images or fonts that the audit will flag.
-- **Real photos:** add optimized JPEG/WebP files to `public/assets/img/` and use
-  `<img src="..." alt="..." width="..." height="..." loading="lazy">`.
-  Images from your own site are already allowed by the CSP. Strip camera
-  metadata (GPS location!) before uploading.
 
 Preview locally with `python3 -m http.server -d public 8000` (or just open
 `public/index.html`), and **always run the audit before deploying**:
@@ -133,5 +146,6 @@ python3 tools/audit_site.py
 ```
 
 It fails if any page gains a script, inline handler or style, external
-resource, form, iframe, webfont or unsafe SVG content, if an image lacks
-`alt`/size, or if the header configs drift apart.
+resource, form, iframe, webfont or unsafe SVG content; if a photo still
+carries metadata; if an image lacks `alt`/size or points at a missing file;
+or if the header configs drift apart.
