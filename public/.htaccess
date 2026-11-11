@@ -1,0 +1,68 @@
+# pwistudio.com: Apache 2.4 configuration for a static, script-free site.
+# Needs mod_headers and mod_rewrite (enabled on almost every host).
+# Keep the header values identical to public/_headers and server/*.
+
+# ---------------------------------------------------------------- basics
+Options -Indexes -Includes -ExecCGI
+DirectoryIndex index.html
+AddDefaultCharset utf-8
+ErrorDocument 403 /404.html
+ErrorDocument 404 /404.html
+
+AddType image/svg+xml .svg
+AddType image/x-icon .ico
+AddType application/xml .xml
+AddCharset utf-8 .html .css .txt .xml .svg
+
+# Never run server-side code from the web root, even if a file appears here.
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .phar .pl .py .cgi .sh .asp .aspx .jsp
+RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .phar
+
+# ------------------------------------------- access rules + canonical host
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # The site only ever needs GET (and HEAD). Refuse everything else.
+  RewriteCond %{REQUEST_METHOD} !^(GET|HEAD)$
+  RewriteRule ^ - [R=405,L]
+
+  # Hide dot-files and dot-folders (.git, .env, .htaccess...), except /.well-known/.
+  RewriteRule "(^|/)\.(?!well-known(/|$))" - [R=404,L]
+
+  # Hide config files for other hosts, scripts, backups and archives.
+  RewriteRule "(^|/)_headers$" - [R=404,L]
+  RewriteRule "\.(php\d?|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp|bak|old|orig|swp|log|ini|conf|env|md|yml|yaml|sql|zip|tar|gz)$" - [NC,R=404,L]
+
+  # Redirect HTTP -> HTTPS and www -> bare domain in one hop.
+  # If the site sits behind a proxy/CDN that terminates TLS, %{HTTPS} is
+  # always off: use the host's "force HTTPS" switch instead and delete
+  # the first condition below.
+  RewriteCond %{HTTPS} !=on [OR]
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteRule ^ https://pwistudio.com%{REQUEST_URI} [R=301,L,NE]
+</IfModule>
+
+# ----------------------------------------------------- security headers
+<IfModule mod_headers.c>
+  Header always set Content-Security-Policy "default-src 'none'; img-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains" "expr=%{HTTPS} == 'on'"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "no-referrer"
+  Header always set Permissions-Policy "accelerometer=(), autoplay=(), browsing-topics=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), hid=(), idle-detection=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), serial=(), sync-xhr=(), usb=(), xr-spatial-tracking=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Embedder-Policy "require-corp"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+  Header always set Origin-Agent-Cluster "?1"
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+  Header always set X-DNS-Prefetch-Control "off"
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+
+  <FilesMatch "\.(css|svg|png|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

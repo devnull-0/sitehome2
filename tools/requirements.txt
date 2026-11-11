@@ -1,0 +1,4 @@
+# Build-time only (tools/build_graphics.py). Nothing here is deployed.
+fonttools>=4.50
+brotli>=1.1
+uharfbuzz>=0.40
