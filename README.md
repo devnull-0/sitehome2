@@ -6,12 +6,18 @@ does not use webfonts.
 It is the home page for **PW&i Studio + Hoffman Images**: graphic design and
 printing (PW&i Studio) and studio photography (Hoffman Images).
 
-- **Palette:** Rust `#B7410E` (dominant), Ochre `#CC7722` (secondary accent),
-  Cream `#EDE8D0` (neutral base), plus a deep brown `#2B1A10` for body text.
-  Every text/background pair meets WCAG AA contrast.
-- **Large lettering as images:** all display headings are SVG vector outlines
-  (`public/assets/type/`), so they look the same everywhere with **no webfonts**.
-  Body text uses the fonts already on the visitor's device.
+- **Palette (warm neutrals):** Linen `#F3EDE3` (background), Ivory `#FBF8F2`,
+  Sand `#E6DCCC`, Oat `#CDBDA6`, Taupe `#9C8775`, Camel `#A8835F`,
+  Mocha `#6E5646` and Espresso `#3A2E26` (text and dark sections).
+  Every text/background pair meets WCAG AA contrast; Taupe and Camel are used
+  only for decoration and large lettering.
+- **Logos as the page title:** the PW&i Design + Print and Hoffman Images logos
+  (`public/assets/logo/`) form the main heading, header and footer.
+- **Typeface: Georgia.** All text is set in Georgia, which is already installed
+  on Windows, macOS and iOS, so nothing is downloaded (**no webfonts**). Android
+  and Linux visitors see their own serif font instead.
+- **Large lettering as images:** section headings are SVG vector outlines
+  (`public/assets/type/`), so they look the same on every device.
 - **No JavaScript, no cookies, no forms, no third-party requests** (no CDNs,
   analytics, embeds or font services).
 
@@ -35,6 +41,7 @@ SVGs are generated, not hand-edited, and contain only plain shapes: no
 public/                 <- the web root: upload only this folder
   index.html, 404.html
   assets/css/site.css   the only stylesheet
+  assets/logo/*.svg     the two logos (full versions + compact header marks)
   assets/type/*.svg     large lettering (generated)
   assets/img/*          illustrations (generated) + social preview image
   favicon.svg/.ico, apple-touch-icon.png, robots.txt, sitemap.xml
@@ -48,7 +55,7 @@ tools/
   build_graphics.py     regenerates the lettering/illustrations (needs Python libs)
   render_png.mjs        regenerates favicon.ico, touch icon, social image (needs Playwright)
   audit_site.py         security audit, standard library only
-  fonts/                Fraunces (SIL OFL), used at build time only, never published
+  fonts/                Gelasio (SIL OFL), Georgia-compatible fallback, build time only
 ```
 
 ## Deploying
@@ -90,7 +97,12 @@ run.
 ## Editing
 
 - **Text:** edit `public/index.html` directly.
-- **Large lettering:** edit the `IMAGES` list in `tools/build_graphics.py`, then:
+- **Large lettering:** the headings are drawn in Georgia when the computer
+  running the script has it (any Mac or Windows PC). Otherwise the script
+  uses Gelasio, a free typeface made to match Georgia's spacing, which is how
+  the current images were made. To redraw them in Georgia itself, run the
+  script on a Mac or PC. Edit the `IMAGES` list in `tools/build_graphics.py`,
+  then:
 
   ```sh
   python3 -m venv .venv
@@ -101,7 +113,14 @@ run.
   Copy the printed `width`/`height` into the matching `<img>` tag.
   Keep the `alt` text identical to the lettering.
 - **Favicon / social image:** `node tools/render_png.mjs` (instructions in the file).
-- **Real photos:** add optimised JPEG/WebP files to `public/assets/img/` and use
+- **Logos:** the files in `public/assets/logo/` were traced into vector shapes
+  from screenshots of the Canva designs. For exact originals, export each logo
+  from Canva as **SVG** (or a large PNG with a transparent background) and
+  replace the matching file, keeping the same file name. Update the
+  `width`/`height` in the `<img>` tags if the proportions change. Run
+  `python3 tools/audit_site.py` afterward: Canva SVGs sometimes contain
+  embedded images or fonts that the audit will flag.
+- **Real photos:** add optimized JPEG/WebP files to `public/assets/img/` and use
   `<img src="..." alt="..." width="..." height="..." loading="lazy">`.
   Images from your own site are already allowed by the CSP. Strip camera
   metadata (GPS location!) before uploading.

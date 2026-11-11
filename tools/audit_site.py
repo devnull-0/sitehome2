@@ -115,7 +115,7 @@ def audit_html(path: Path) -> None:
         fail(path, "missing <meta name=\"referrer\">")
     if p.h1 != 1:
         fail(path, f"expected exactly one <h1>, found {p.h1}")
-    if not re.search(r'<html[^>]+lang="[a-z-]+"', text):
+    if not re.search(r'<html[^>]+lang="[A-Za-z]{2,3}(-[A-Za-z0-9]+)*"', text):
         fail(path, "<html> needs a lang attribute")
 
 
